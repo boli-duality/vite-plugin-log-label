@@ -30,7 +30,7 @@ VitePluginLogs({
   // Set `false` to disable.
   dts: './logs.d.ts',
 
-  //需要替换的log函数名
+  // log function name to be replaced
   identifier: 'logs',
 })
 ```
