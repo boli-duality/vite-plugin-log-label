@@ -1,13 +1,14 @@
 {
-  "name": "@bolinjs/vite-plugin-logs",
+  "name": "@bolinjs/vite-plugin-log-label",
   "version": "1.0.0",
   "description": "A Vite plugin that replaces logs() with styled console.log outputs during compilation and provides type declarations",
   "type": "module",
-  "main": "dist/index.mjs",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
-    "dev": "unbuild --stub",
     "build": "unbuild",
+    "dev": "unbuild --stub",
     "postinstall": "npx simple-git-hooks",
     "prepublishOnly": "npm run build"
   },
@@ -26,7 +27,8 @@
   "keywords": [
     "vite",
     "plugin",
-    "logs",
+    "label",
+    "log",
     "console",
     "debug",
     "development"
@@ -36,14 +38,18 @@
     "email": "youbolin001@163.com"
   },
   "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/boli-duality/vite-plugin-logs.git"
+    "url": "https://github.com/boli-duality/vite-plugin-log-label.git"
   },
   "bugs": {
-    "url": "https://github.com/boli-duality/vite-plugin-logs/issues"
+    "url": "https://github.com/boli-duality/vite-plugin-log-label/issues"
   },
-  "homepage": "https://github.com/boli-duality/vite-plugin-logs#readme",
+  "homepage": "https://github.com/boli-duality/vite-plugin-log-label#readme",
   "packageManager": "pnpm@10.6.2",
   "engines": {
     "node": "^22.0.0"
@@ -61,6 +67,7 @@
     "@vue/eslint-config-typescript": "^14.5.0",
     "eslint": "^9.24.0",
     "lint-staged": "^15.5.0",
+    "local-pkg": "^1.1.1",
     "prettier": "^3.5.3",
     "simple-git-hooks": "^2.12.1",
     "unbuild": "^3.5.0",

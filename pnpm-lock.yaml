@@ -43,6 +43,9 @@ importers:
       lint-staged:
         specifier: ^15.5.0
         version: 15.5.0
+      local-pkg:
+        specifier: ^1.1.1
+        version: 1.1.1
       prettier:
         specifier: ^3.5.3
         version: 3.5.3
@@ -1805,6 +1808,13 @@ packages:
       }
     engines: { node: '>=18.0.0' }
 
+  local-pkg@1.1.1:
+    resolution:
+      {
+        integrity: sha512-WunYko2W1NcdfAFpuLUoucsgULmgDBRkdxHxWQ7mK0cQqwPiy8E1enjuRBrhLtZkB5iScJ1XIPdhVEFK8aOLSg==,
+      }
+    engines: { node: '>=14' }
+
   locate-path@6.0.0:
     resolution:
       {
@@ -2413,6 +2423,12 @@ packages:
         integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==,
       }
     engines: { node: '>=6' }
+
+  quansync@0.2.10:
+    resolution:
+      {
+        integrity: sha512-t41VRkMYbkHyCYmOvx/6URnN80H7k4X0lLdBMGsz+maAwrJQYB1djpV6vHrQIBE0WBSGqhtEHrK9U3DWWH8v7A==,
+      }
 
   queue-microtask@1.2.3:
     resolution:
@@ -3810,6 +3826,12 @@ snapshots:
       rfdc: 1.4.1
       wrap-ansi: 9.0.0
 
+  local-pkg@1.1.1:
+    dependencies:
+      mlly: 1.7.4
+      pkg-types: 2.1.0
+      quansync: 0.2.10
+
   locate-path@6.0.0:
     dependencies:
       p-locate: 5.0.0
@@ -4144,6 +4166,8 @@ snapshots:
   pretty-bytes@6.1.1: {}
 
   punycode@2.3.1: {}
+
+  quansync@0.2.10: {}
 
   queue-microtask@1.2.3: {}
 

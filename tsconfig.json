@@ -2,7 +2,6 @@
   "extends": "@tsconfig/node22/tsconfig.json",
   "include": ["src"],
   "compilerOptions": {
-    "outDir": "dist",
     "noEmit": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
 
