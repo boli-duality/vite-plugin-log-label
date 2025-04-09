@@ -81,7 +81,7 @@ function createStyledConsoleLog(node: t.CallExpression, bg: string, color: strin
 }
 
 export default function VitePluginLogLabel(options: Options = {}): Plugin {
-  const dts = options.dts ?? (TS && './logs.d.ts')
+  const dts = options.dts ?? (TS && './log-label.d.ts')
   const identifier = options.identifier || 'logs'
 
   return {

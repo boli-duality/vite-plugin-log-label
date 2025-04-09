@@ -28,7 +28,7 @@ VitePluginLogLabel({
   // Filepath to generate corresponding .d.ts file.
   // Defaults to './logs.d.ts' when `typescript` is installed locally.
   // Set `false` to disable.
-  dts: './logs.d.ts',
+  dts: './log-label.d.ts',
 
   // log function name to be replaced
   identifier: 'logs',
