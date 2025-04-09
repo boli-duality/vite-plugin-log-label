@@ -26,7 +26,7 @@ export default {
 ```javascript
 VitePluginLogLabel({
   // Filepath to generate corresponding .d.ts file.
-  // Defaults to './logs.d.ts' when `typescript` is installed locally.
+  // Defaults to './log-label.d.ts' when `typescript` is installed locally.
   // Set `false` to disable.
   dts: './log-label.d.ts',
 
