@@ -87,7 +87,7 @@ export default function VitePluginLogLabel(options: Options = {}, root = baseRoo
       if (!/\.([tj]sx?|vue)$/.test(id)) return
       if (!code.includes(identifier)) return
 
-      let needCreateDts = false
+      let isTransformed = false
 
       try {
         // 1. 解析为 AST
@@ -129,7 +129,7 @@ export default function VitePluginLogLabel(options: Options = {}, root = baseRoo
             // 3. 替换原始节点
             if (newNode) {
               path.replaceWith(newNode)
-              needCreateDts = true
+              isTransformed = true
             }
           },
           Identifier(path) {
@@ -146,22 +146,22 @@ export default function VitePluginLogLabel(options: Options = {}, root = baseRoo
               // 条件4：确保是独立引用
               if (!isDeclaration && !isPropertyAccess) {
                 path.replaceWith(t.memberExpression(t.identifier('console'), t.identifier('log')))
-                needCreateDts = true
+                isTransformed = true
               }
             }
           },
         })
 
+        if (!isTransformed) return
+        if (typeof dts === 'string' && !hasDts) createDts(dts, identifier)
+
         // 3. 生成代码
         const output = generate(ast, {
           retainLines: true,
-          comments: true, // 保留其他注释
           compact: false, // 不压缩代码
         })
 
-        if (typeof dts === 'string' && !hasDts && needCreateDts) createDts(dts, identifier)
-
-        return { code: output.code, map: output.map }
+        return output
       } catch (error: any) {
         console.log(`[vite-plugin-log-label] Error processing ${id}:`, error)
       }
