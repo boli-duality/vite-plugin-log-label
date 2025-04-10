@@ -5,8 +5,9 @@ import * as t from '@babel/types'
 import type { Plugin } from 'vite'
 import { writeFileSync, mkdirSync, existsSync } from 'fs'
 import { dirname, resolve } from 'path'
-import { Options } from './index.type'
+import { Options, ThemeConfig } from './index.type'
 import { isPackageExists } from 'local-pkg'
+import { baseTheme, getStyle } from './style'
 
 const TS = isPackageExists('typescript')
 
@@ -14,29 +15,28 @@ const traverse: typeof _traverse = (_traverse as any).default || _traverse
 
 let hasDts = false
 function createDts(dts: string, identifier: string) {
-  // 解析最终路径（处理相对路径和绝对路径）
-  const path = resolve(process.cwd(), dts)
-
   // 确保目录存在
-  const dir = dirname(path)
+  const dir = dirname(dts)
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true })
 
   // 生成 .d.ts 内容
   const dtsContent = `declare const ${identifier}: {
   (label?: any, ...data: any[]): void
-  error: (label?: any, ...data: any[]) => void
+  base: (label?: any, ...data: any[]) => void
+  info: (label?: any, ...data: any[]) => void
+  success: (label?: any, ...data: any[]) => void
   warn: (label?: any, ...data: any[]) => void
+  error: (label?: any, ...data: any[]) => void
   /** key: \`\${bg},\${color}\` */
   [key: string]: (label?: any, ...data: any[]) => void
 }
 `
-
   // 写入文件
-  writeFileSync(path, dtsContent)
+  writeFileSync(dts, dtsContent)
   hasDts = true
 }
 
-function createStyledConsoleLog(node: t.CallExpression, bg: string, color: string = '#fff') {
+function createStyledConsoleLog(node: t.CallExpression, style: string | undefined) {
   const args: Array<t.Expression | t.SpreadElement | t.ArgumentPlaceholder> = []
 
   if (node.arguments.length) {
@@ -52,22 +52,8 @@ function createStyledConsoleLog(node: t.CallExpression, bg: string, color: strin
     }
 
     args.push(
-      t.templateLiteral(
-        [t.templateElement({ raw: `%c${labelStr}`, cooked: `%c${labelStr}` }, true)],
-        []
-      ),
-      t.templateLiteral(
-        [
-          t.templateElement(
-            {
-              raw: `background:${bg};color:${color};padding:2px 5px;border-radius:4px;`,
-              cooked: `background:${bg};color:${color};padding:2px 5px;border-radius:4px;`,
-            },
-            true
-          ),
-        ],
-        []
-      ),
+      t.stringLiteral(`%c${labelStr}`),
+      style ? t.stringLiteral(style) : t.identifier('undefined'),
       ...data // 保留原始数据参数
     )
   }
@@ -80,9 +66,19 @@ function createStyledConsoleLog(node: t.CallExpression, bg: string, color: strin
   return newNode
 }
 
-export default function VitePluginLogLabel(options: Options = {}): Plugin {
-  const dts = options.dts ?? (TS && './log-label.d.ts')
-  const identifier = options.identifier || 'logs'
+// 默认root，兼容uniapp
+function baseRoot() {
+  return process.env.UNI_INPUT_DIR || process.env.VITE_ROOT_DIR || process.cwd()
+}
+
+export default function VitePluginLogLabel(options: Options = {}, root = baseRoot()): Plugin {
+  let dts: string | boolean | undefined
+  if (options.dts === false) dts = false
+  else if (typeof options.dts === 'string') dts = resolve(root, options.dts)
+  else if (options.dts === true || TS) dts = resolve(root, 'log-label.d.ts')
+
+  const identifier = options.identifier || 'logl'
+  const themes = Object.assign(baseTheme, options.theme) as { [k: string]: ThemeConfig }
 
   return {
     name: 'vite-plugin-log-label',
@@ -104,37 +100,36 @@ export default function VitePluginLogLabel(options: Options = {}): Plugin {
         traverse(ast, {
           CallExpression(path) {
             const node = path.node
-            // 1. 匹配 logs() 调用
+            let newNode: t.CallExpression | undefined
+            // 1. 匹配 logl() 调用
             if (t.isIdentifier(node.callee, { name: identifier })) {
               // 2. 创建带样式的 console.log 节点
-              const newNode = createStyledConsoleLog(node, '#67C23A')
-              // 3. 替换原始节点
-              path.replaceWith(newNode)
-
-              needCreateDts = true
+              newNode = createStyledConsoleLog(node, getStyle(themes.base))
             }
-            // 匹配 logs.[type]() 调用
-            if (
+            // 匹配 logl[style]() 调用
+            else if (
               t.isMemberExpression(node.callee) &&
-              t.isIdentifier(node.callee.object, { name: 'logs' })
+              t.isIdentifier(node.callee.object, { name: 'logl' })
             ) {
-              // 匹配 logs.warn()
-              if (t.isIdentifier(node.callee.property, { name: 'warn' })) {
-                const newNode = createStyledConsoleLog(node, '#E6A23C')
-                path.replaceWith(newNode)
+              const property = node.callee.property
+              // 匹配 logl.identifier()
+              if (t.isIdentifier(property)) {
+                if (Object.hasOwn(themes, property.name)) {
+                  newNode = createStyledConsoleLog(node, getStyle(themes[property.name]))
+                } else {
+                  newNode = createStyledConsoleLog(node, undefined)
+                }
               }
-              // 匹配 logs.error()
-              else if (t.isIdentifier(node.callee.property, { name: 'error' })) {
-                const newNode = createStyledConsoleLog(node, '#F56C6C')
-                path.replaceWith(newNode)
-              } else if (t.isStringLiteral(node.callee.property)) {
-                const colors = node.callee.property.value.split(',').map(v => v.trim()) as [
-                  string,
-                  string,
-                ]
-                const newNode = createStyledConsoleLog(node, ...colors)
-                path.replaceWith(newNode)
+              // 匹配 logl[custom]()
+              else if (t.isStringLiteral(property)) {
+                const colors = property.value.split(',').map(v => v.trim()) as [string, string]
+                newNode = createStyledConsoleLog(node, getStyle(colors))
               }
+            }
+            // 3. 替换原始节点
+            if (newNode) {
+              path.replaceWith(newNode)
+              needCreateDts = true
             }
           },
           Identifier(path) {
@@ -151,7 +146,6 @@ export default function VitePluginLogLabel(options: Options = {}): Plugin {
               // 条件4：确保是独立引用
               if (!isDeclaration && !isPropertyAccess) {
                 path.replaceWith(t.memberExpression(t.identifier('console'), t.identifier('log')))
-
                 needCreateDts = true
               }
             }
@@ -165,11 +159,11 @@ export default function VitePluginLogLabel(options: Options = {}): Plugin {
           compact: false, // 不压缩代码
         })
 
-        if (dts && !hasDts && needCreateDts) createDts(dts, identifier)
+        if (typeof dts === 'string' && !hasDts && needCreateDts) createDts(dts, identifier)
 
         return { code: output.code, map: output.map }
       } catch (error: any) {
-        console.warn(`Error processing ${id}:`, error)
+        console.log(`[vite-plugin-log-label] Error processing ${id}:`, error)
       }
     },
   }

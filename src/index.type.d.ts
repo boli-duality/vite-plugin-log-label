@@ -1,12 +1,24 @@
+type ThemeConfig = [bg: string, color: string] | string
+
 export interface Options {
   /**
    * .d.ts 文件路径
-   * @default './logs.d.ts'
+   * @default './log-label.d.ts'
    */
-  dts?: string | false
+  dts?: string | boolean
+
   /**
-   * 需要替换的log函数名
-   * @default 'logs'
+   * log function name to be replaced
+   * @default 'logl'
    */
   identifier?: string
+
+  theme?: {
+    base?: ThemeConfig
+    info?: ThemeConfig
+    success?: ThemeConfig
+    error?: ThemeConfig
+    warn?: ThemeConfig
+    [key: string]: ThemeConfig
+  }
 }

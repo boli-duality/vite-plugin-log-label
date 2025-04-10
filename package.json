@@ -1,7 +1,7 @@
 {
   "name": "@bolinjs/vite-plugin-log-label",
   "version": "1.0.2",
-  "description": "A Vite plugin that replaces logs() with styled console.log outputs during compilation and provides type declarations",
+  "description": "A Vite plugin that replaces logl() with styled console.log outputs during compilation and provides type declarations",
   "type": "module",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
@@ -9,6 +9,8 @@
   "scripts": {
     "build": "unbuild",
     "dev": "unbuild --stub",
+    "lint": "eslint . --fix",
+    "format": "prettier --write src/",
     "postinstall": "npx simple-git-hooks",
     "prepublishOnly": "npm run build"
   },
@@ -52,7 +54,7 @@
   "homepage": "https://github.com/boli-duality/vite-plugin-log-label#readme",
   "packageManager": "pnpm@10.6.2",
   "engines": {
-    "node": "^22.0.0"
+    "node": ">=18.0.0"
   },
   "devDependencies": {
     "@babel/generator": "^7.27.0",
