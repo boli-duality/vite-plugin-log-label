@@ -30,6 +30,7 @@
   "keywords": [
     "vite",
     "plugin",
+    "vue",
     "label",
     "log",
     "console",
@@ -57,11 +58,18 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "devDependencies": {
+  "peerDependencies": {
+    "vite": "^5.0.0 || ^6.0.0",
+    "vue": "^3.2.25"
+  },
+  "dependencies": {
     "@babel/generator": "^7.27.0",
     "@babel/parser": "^7.27.0",
     "@babel/traverse": "^7.27.0",
     "@babel/types": "^7.27.0",
+    "local-pkg": "^1.1.1"
+  },
+  "devDependencies": {
     "@tsconfig/node22": "^22.0.1",
     "@types/babel__generator": "^7.27.0",
     "@types/babel__traverse": "^7.20.7",
@@ -70,10 +78,10 @@
     "@vue/eslint-config-typescript": "^14.5.0",
     "eslint": "^9.24.0",
     "lint-staged": "^15.5.0",
-    "local-pkg": "^1.1.1",
     "prettier": "^3.5.3",
     "simple-git-hooks": "^2.12.1",
     "unbuild": "^3.5.0",
-    "vite": "^6.2.6"
+    "vite": "^6.2.6",
+    "vue": "^3.5.13"
   }
 }

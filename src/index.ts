@@ -1,5 +1,5 @@
 import { parse } from '@babel/parser'
-import _traverse from '@babel/traverse'
+import cjs_traverse from '@babel/traverse'
 import { generate } from '@babel/generator'
 import * as t from '@babel/types'
 import type { Plugin } from 'vite'
@@ -8,10 +8,10 @@ import { dirname, resolve } from 'path'
 import { Options, ThemeConfig } from './index.type'
 import { isPackageExists } from 'local-pkg'
 import { baseTheme, getStyle } from './style'
+import { getDefaultExportFromCjs } from '../utils'
 
+const traverse = getDefaultExportFromCjs(cjs_traverse)
 const TS = isPackageExists('typescript')
-
-const traverse: typeof _traverse = (_traverse as any).default || _traverse
 
 let hasDts = false
 function createDts(dts: string, identifier: string) {
@@ -71,7 +71,8 @@ function baseRoot() {
   return process.env.UNI_INPUT_DIR || process.env.VITE_ROOT_DIR || process.cwd()
 }
 
-export default function VitePluginLogLabel(options: Options = {}, root = baseRoot()): Plugin {
+export default function VitePluginLogLabel(options: Options = {}): Plugin {
+  const root = options.root || baseRoot()
   let dts: string | boolean | undefined
   if (options.dts === false) dts = false
   else if (typeof options.dts === 'string') dts = resolve(root, options.dts)
@@ -93,7 +94,7 @@ export default function VitePluginLogLabel(options: Options = {}, root = baseRoo
         // 1. 解析为 AST
         const ast = parse(code, {
           sourceType: 'module',
-          plugins: ['typescript'],
+          plugins: ['typescript', 'jsx'],
         })
 
         // 2. AST 转换

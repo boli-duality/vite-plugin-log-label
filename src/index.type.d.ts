@@ -21,4 +21,6 @@ export interface Options {
     warn?: ThemeConfig
     [key: string]: ThemeConfig
   }
+
+  root?: string
 }
