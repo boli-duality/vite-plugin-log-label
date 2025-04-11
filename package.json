@@ -1,7 +1,7 @@
 {
   "name": "@bolinjs/vite-plugin-log-label",
   "version": "1.1.0",
-  "description": "A Vite plugin that replaces logl() with styled console.log outputs during compilation and provides type declarations",
+  "description": "A Vite plugin that replaces _log() with styled console.log outputs during compilation and provides type declarations",
   "type": "module",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",

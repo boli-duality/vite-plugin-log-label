@@ -3,12 +3,14 @@ import cjs_traverse from '@babel/traverse'
 import { generate } from '@babel/generator'
 import * as t from '@babel/types'
 import type { Plugin } from 'vite'
-import { writeFileSync, mkdirSync, existsSync } from 'fs'
+import { writeFileSync, mkdirSync, existsSync, readFileSync } from 'fs'
 import { dirname, resolve } from 'path'
 import { Options, ThemeConfig } from './index.type'
 import { isPackageExists } from 'local-pkg'
 import { baseTheme, getStyle } from './style'
-import { getDefaultExportFromCjs } from '../utils'
+import { getDefaultExportFromCjs } from './utils'
+import { resolveCompiler } from './utils/vueCompiler'
+import type * as _compiler from 'vue/compiler-sfc'
 
 const traverse = getDefaultExportFromCjs(cjs_traverse)
 const TS = isPackageExists('typescript')
@@ -78,15 +80,35 @@ export default function VitePluginLogLabel(options: Options = {}): Plugin {
   else if (typeof options.dts === 'string') dts = resolve(root, options.dts)
   else if (options.dts === true || TS) dts = resolve(root, 'log-label.d.ts')
 
-  const identifier = options.identifier || 'logl'
+  const identifier = options.identifier || '_log'
   const themes = Object.assign(baseTheme, options.theme) as { [k: string]: ThemeConfig }
+
+  let compiler: typeof _compiler | undefined
 
   return {
     name: 'vite-plugin-log-label',
+    buildStart() {
+      compiler = resolveCompiler(process.cwd())
+    },
+    async load(id) {
+      // 处理 vue 文件
+      if (!/\.vue$/.test(id) || !compiler) return
+      // console.log(code)
+      const code = readFileSync(id, 'utf-8')
+
+      const { descriptor } = compiler.parse(code, {
+        filename: 'App.vue', // 用于错误提示定位
+        sourceMap: true, // 生成源码映射（可选）
+      })
+
+      console.log(descriptor)
+      // const result = compiler.compileScript(descriptor, code)
+    },
     transform(code: string, id: string) {
-      // 仅处理 JS/TS 文件
-      if (!/\.([tj]sx?|vue)$/.test(id)) return
       if (!code.includes(identifier)) return
+      // 处理 js/jsx/ts/tsx 文件
+      if (!/\.[tj]sx?$/.test(id)) return
+      console.log('处理 js/ts/tsx 文件', id)
 
       let isTransformed = false
 
@@ -102,18 +124,18 @@ export default function VitePluginLogLabel(options: Options = {}): Plugin {
           CallExpression(path) {
             const node = path.node
             let newNode: t.CallExpression | undefined
-            // 1. 匹配 logl() 调用
+            // 1. 匹配 _log() 调用
             if (t.isIdentifier(node.callee, { name: identifier })) {
               // 2. 创建带样式的 console.log 节点
               newNode = createStyledConsoleLog(node, getStyle(themes.base))
             }
-            // 匹配 logl[style]() 调用
+            // 匹配 _log[style]() 调用
             else if (
               t.isMemberExpression(node.callee) &&
-              t.isIdentifier(node.callee.object, { name: 'logl' })
+              t.isIdentifier(node.callee.object, { name: '_log' })
             ) {
               const property = node.callee.property
-              // 匹配 logl.identifier()
+              // 匹配 _log.identifier()
               if (t.isIdentifier(property)) {
                 if (Object.hasOwn(themes, property.name)) {
                   newNode = createStyledConsoleLog(node, getStyle(themes[property.name]))
@@ -121,7 +143,7 @@ export default function VitePluginLogLabel(options: Options = {}): Plugin {
                   newNode = createStyledConsoleLog(node, undefined)
                 }
               }
-              // 匹配 logl[custom]()
+              // 匹配 _log[custom]()
               else if (t.isStringLiteral(property)) {
                 const colors = property.value.split(',').map(v => v.trim()) as [string, string]
                 newNode = createStyledConsoleLog(node, getStyle(colors))

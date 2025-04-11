@@ -9,7 +9,7 @@ export interface Options {
 
   /**
    * log function name to be replaced
-   * @default 'logl'
+   * @default '_log'
    */
   identifier?: string
 

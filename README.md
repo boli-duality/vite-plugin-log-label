@@ -1,6 +1,6 @@
 # Vite Plugin Log Label
 
-A Vite plugin that replaces `logl()` with styled console.log outputs during compilation and provides type declarations.
+A Vite plugin that replaces `_log()` with styled console.log outputs during compilation and provides type declarations.
 
 ## Install
 
@@ -31,10 +31,10 @@ VitePluginLogLabel({
   dts: './log-label.d.ts',
 
   // log function name to be replaced
-  identifier: 'logl',
+  identifier: '_log',
 
   // themes
-  // usage: logl.theme()
+  // usage: _log.theme()
   theme: {
     // preset
     base: `background-image: linear-gradient(to right, #92fe9d 0%, #00c9ff 100%);color:#000;padding:2px 5px;border-radius:4px;`,
@@ -51,12 +51,12 @@ VitePluginLogLabel({
 ## Usage
 
 ```javascript
-logl(any)
-logl.base(any)
-logl.info(any)
-logl.success(any)
-logl.warn(any)
-logl.error(any)
-logl.custom(any)
-logl['pink,#000'](any)
+_log(any)
+_log.base(any)
+_log.info(any)
+_log.success(any)
+_log.warn(any)
+_log.error(any)
+_log.custom(any)
+_log['pink,#000'](any)
 ```
