@@ -10,13 +10,29 @@ pnpm i -D @bolinjs/vite-plugin-log-label
 
 ```javascript
 // vite.config.js
-import VitePluginLogLabel from '@bolinjs/vite-plugin-log-label'
+import LogLabel from '@bolinjs/vite-plugin-log-label'
 
 export default {
   plugins: [
-    VitePluginLogLabel({
+    LogLabel({
       /* options */
     }),
+  ],
+}
+```
+
+如果要配合uniapp的日志回显，需要放在uni插件之前
+
+```javascript
+// vite.config.js
+import LogLabel from '@bolinjs/vite-plugin-log-label'
+
+export default {
+  plugins: [
+    LogLabel({
+      /* options */
+    }),
+    uni(),
   ],
 }
 ```
@@ -24,7 +40,7 @@ export default {
 ## Configuration
 
 ```javascript
-VitePluginLogLabel({
+LogLabel({
   // Filepath to generate corresponding .d.ts file.
   // Defaults to './log-label.d.ts' when `typescript` is installed locally.
   // Set `false` to disable.
