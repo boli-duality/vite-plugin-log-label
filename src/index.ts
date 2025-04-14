@@ -1,5 +1,5 @@
 import type { Plugin } from 'vite'
-import { resolve } from 'path'
+import { resolve } from 'node:path'
 import { Options, ThemeConfig } from './index.type'
 import { isPackageExists } from 'local-pkg'
 import { resolveCompiler } from './utils/vueCompiler'
