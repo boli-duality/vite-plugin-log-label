@@ -32,7 +32,7 @@ export function transformTs(
       // 匹配 _log[style]() 调用
       else if (
         t.isMemberExpression(node.callee) &&
-        t.isIdentifier(node.callee.object, { name: '_log' })
+        t.isIdentifier(node.callee.object, { name: identifier })
       ) {
         const property = node.callee.property
         // 匹配 _log.identifier()
@@ -56,18 +56,21 @@ export function transformTs(
       }
     },
     Identifier(path) {
-      // 条件1：标识符名为logs
+      // 条件1：标识符名为_log
       if (path.node.name === identifier) {
         // 条件2：不是变量声明语句
         const isDeclaration =
           t.isVariableDeclarator(path.parent) || t.isFunctionDeclaration(path.parent)
 
-        // 条件3：不是属性访问（如obj.logs）
+        // 条件3：不是属性访问（如obj._log）
         const isPropertyAccess =
           t.isMemberExpression(path.parent) && path.parent.property === path.node
 
-        // 条件4：确保是独立引用
-        if (!isDeclaration && !isPropertyAccess) {
+        // 条件4：不是类方法
+        const isClassMethod = t.isClassMethod(path.parent)
+
+        // 确保是独立引用
+        if (!isDeclaration && !isPropertyAccess && !isClassMethod) {
           path.replaceWith(t.memberExpression(t.identifier('console'), t.identifier('log')))
           isTransformed = true
         }
