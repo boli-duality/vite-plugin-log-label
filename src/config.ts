@@ -2,7 +2,7 @@ import { ThemeConfig } from './index.type'
 
 // 默认root，兼容uniapp
 export function baseRoot() {
-  return process.env.UNI_INPUT_DIR || process.env.VITE_ROOT_DIR || process.cwd()
+  return process.env.VITE_ROOT_DIR || process.cwd()
 }
 
 export const baseTheme: { [key: string]: ThemeConfig } = {
