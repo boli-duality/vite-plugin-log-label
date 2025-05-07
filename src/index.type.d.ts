@@ -14,7 +14,7 @@ export interface Options {
   identifier?: string
 
   theme?: {
-    base?: ThemeConfig
+    default?: ThemeConfig
     info?: ThemeConfig
     success?: ThemeConfig
     error?: ThemeConfig

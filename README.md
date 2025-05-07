@@ -53,7 +53,7 @@ LogLabel({
   // usage: _log.theme()
   theme: {
     // preset
-    base: `background-image: linear-gradient(to right, #92fe9d 0%, #00c9ff 100%);color:#000;padding:2px 5px;border-radius:4px;`,
+    default: `background-image: linear-gradient(to right, #92fe9d 0%, #00c9ff 100%);color:#000;padding:2px 5px;border-radius:4px;`,
     info: ['#165DFF', '#fff'],
     success: ['#00B42A', '#fff'],
     warn: ['#FF7D00', '#fff'],
@@ -68,7 +68,7 @@ LogLabel({
 
 ```javascript
 _log(any)
-_log.base(any)
+_log.default(any)
 _log.info(any)
 _log.success(any)
 _log.warn(any)

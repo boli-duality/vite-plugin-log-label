@@ -9,6 +9,9 @@
   "scripts": {
     "build": "unbuild",
     "dev": "unbuild --stub",
+    "patch": "npm version patch",
+    "minor": "npm version minor",
+    "major": "npm version major",
     "lint": "eslint . --fix",
     "format": "prettier --write src/",
     "up": "npx taze major -I",
