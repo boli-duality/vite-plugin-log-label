@@ -31,7 +31,7 @@ export default function VitePluginLogLabel(options: Options = {}): Plugin {
         // 处理 vue 文件
         if (/\.vue$/.test(id)) return transformVue(code, { identifier, themes })
         // 处理 js/jsx/ts/tsx 文件
-        if (!/\.[tj]sx?$/.test(id)) return transformTs(code, { identifier, themes })?.code
+        if (/\.[tj]sx?$/.test(id)) return transformTs(code, { identifier, themes })?.code
       } catch (error: any) {
         console.log(`[vite-plugin-log-label] Error processing ${id}:`, error)
       }
